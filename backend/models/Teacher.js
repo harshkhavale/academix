@@ -42,7 +42,6 @@ const Teacher = mongoose.Schema(
 
     profilepicture: {
       type: String,
-      required: true,
     },
     coverpicture: {
       type: String,
@@ -58,6 +57,9 @@ const Teacher = mongoose.Schema(
         type: String,
       },
     ],
+    location: {
+      type: String,
+    },
   },
   {
     timestamps: true,

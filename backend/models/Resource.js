@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-
+import Classroom from "./Classroom.js";
 const Resource = mongoose.Schema(
   {
     name: {
@@ -10,6 +10,12 @@ const Resource = mongoose.Schema(
       type: String,
       required: true,
     },
+    classroom: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Classroom",
+      required: true,
+    },
+
     files: [
       {
         filename: {

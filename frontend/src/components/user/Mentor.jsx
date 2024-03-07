@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
 import { publicRequest } from "../../redux/requestMethods";
-import MentorCard from "../widgets/MentorCard";
+import ProfileCard from "../widgets/ProfileCard";
 
 const Mentor = () => {
   const [mentors, setMentors] = useState([]);
@@ -25,7 +25,7 @@ const Mentor = () => {
     <div className="flex justify-center min-h-screen">
       <div className="flex flex-wrap h-min w-screen gap-8 p-2 md:w-[60vw]">
         {mentors.map((mentor, index) => (
-          <MentorCard key={index} mentor={mentor} />
+          <ProfileCard key={index} mentor={mentor} />
         ))}
       </div>
     </div>

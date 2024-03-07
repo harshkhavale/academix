@@ -1,5 +1,11 @@
 import React from "react";
-import { graph, random, teacherbanner, user } from "../../assets";
+import {
+  advertisement,
+  graph,
+  random,
+  teacherbanner,
+  user,
+} from "../../assets";
 import { studentDashboardMentors } from "../../constants/indexStudent";
 import CalendarComponent from "../widgets/CalendarComponent";
 import { DateCalendar } from "@mui/x-date-pickers/DateCalendar";
@@ -10,19 +16,20 @@ const Profile = () => {
   const user = useSelector((state) => state.user.user);
 
   return (
-    <div>
-      <div className="flex flex-col items-center p-4 shadow-xl h-screen">
+    <div className=" flex flex-col">
+      <div className="flex flex-col items-center p-4 shadow-xl">
         <p className="text-sm font-semibold mb-4 text-primary">Your Profile</p>
-
         <div className="rounded-full overflow-hidden border-4 border-primary mb-4">
           <img
-            src={teacherbanner}
+            src={`http://localhost:5000/database/${user.profile}`}
             alt="Profile"
             className="w-20 h-20 object-cover"
           />
         </div>
-
         <p className="text-xl font-semibold mb-2">{user.fullname}</p>
+      </div>
+      <div className=" advertisement">
+        <img src={advertisement} alt="add" className=" w-[15vw] h-auto" />
       </div>
     </div>
   );

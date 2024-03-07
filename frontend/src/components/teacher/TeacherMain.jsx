@@ -7,7 +7,7 @@ import BarChart from "../widgets/BarChart";
 import PolarAreaChart from "../widgets/PolarAreaChart";
 import { attendance, score } from "../../constants/student";
 import { teacherbanner, userbanner } from "../../assets";
-import SubjectCard from "../widgets/SubjectCard";
+import SubjectCard from "../widgets/ClassroomCard";
 import LineChart from "../widgets/LineChart";
 import { enrollments } from "../../constants/user";
 

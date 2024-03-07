@@ -41,6 +41,7 @@ export const createClassroom = async (req, res) => {
         uuid,
         thumbnail,
       });
+
       const savedClassroom = await newClassroom.save();
       res.status(201).json(savedClassroom);
     });

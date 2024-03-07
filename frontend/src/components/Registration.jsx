@@ -19,12 +19,12 @@ import {
 import { motion } from "framer-motion";
 import { slideFromLeft } from "../constants/style.js";
 import { publicRequest } from "../redux/requestMethods.js";
-import { setUsertype } from "../redux/userSlice.js";
 import { FaGoogle } from "react-icons/fa";
 import { FaGithub } from "react-icons/fa";
 import { BsApple } from "react-icons/bs";
 import { MdOutlineFileUpload } from "react-icons/md";
 import Compressor from "compressorjs";
+import { setUser } from "../redux/userSlice.js";
 
 const Registration = () => {
   const isNonMobileScreen = useMediaQuery("(min-width:1000px)");
@@ -57,6 +57,8 @@ const Registration = () => {
 
         console.log(response);
         toast.success("Registration successful!");
+        dispatch(setUser(response.data));
+
         navigate("/userdashboard");
       } catch (error) {
         // Handle any errors that might occur during registration
@@ -182,7 +184,7 @@ const Registration = () => {
           <p className="font-bold">profile picture</p>
           <div className="profileimage relative rounded-3xl flex items-center justify-center  h-[25vh] w-full overflow-hidden    border-2 border-gray-400 border-dashed ">
             {previewProfileImage && (
-              <div className=" h-[25vh] w-[25vh]">
+              <div className=" h-[25vh] w-full">
                 <img
                   src={previewProfileImage}
                   alt="Profile Preview"

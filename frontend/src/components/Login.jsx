@@ -10,10 +10,10 @@ import { motion } from "framer-motion";
 import { slideFromLeft } from "../constants/style";
 import { useDispatch, useSelector } from "react-redux";
 import { publicRequest } from "../redux/requestMethods.js";
-import { setUsertype } from "../redux/userSlice.js";
 import { FaGoogle } from "react-icons/fa";
 import { FaGithub } from "react-icons/fa";
 import { BsApple } from "react-icons/bs";
+import { setUser } from "../redux/userSlice.js";
 const Login = () => {
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
@@ -25,45 +25,29 @@ const Login = () => {
   const handleClick = async (e) => {
     e.preventDefault();
     try {
-      await login(dispatch, { email, password });
+      const res = await publicRequest.post("/auth/login", { email, password });
+      console.log("login res - ", res.data);
+      if (res.status === 200) {
+        toast.success("Login successful!");
+        if (res.data.isTeacher) {
+          navigate("/teacherdashboard");
+          const response = await publicRequest.get(
+            `/teachers/find-user/${res.data.id}`
+          );
+          dispatch(setUser({ ...res.data, ...response.data }));
+        } else {
+          navigate("/userdashboard");
+          dispatch(setUser(res.data));
+        }
+      } else {
+        toast.error(res.data.message);
+      }
     } catch (err) {
       console.error("Login failed:", err);
       toast.error("Login failed. Please try again.");
     }
   };
 
-  useEffect(() => {
-    const fetchData = async () => {
-      if (error) {
-        toast.error("Login failed. Please try again.");
-      } else if (!isFetching && user) {
-        // Assuming 'user' is the data returned upon successful login
-        handleLoginSuccess();
-        toast.success("Login successful!");
-        try {
-          const mentor = await publicRequest.get(`/mentors/check/${user.id}`);
-          console.log(mentor);
-          if (mentor.data) {
-            // If mentor data is returned, set usertype to "Mentor"
-            dispatch(setUsertype("MENTOR"));
-          }
-          navigate("/mentordashboard");
-        } catch (error) {
-          console.error("Error fetching mentor:", error);
-          navigate("/userdashboard");
-          dispatch(setUsertype("USER"));
-
-          // Handle error
-        }
-      }
-    };
-
-    fetchData(); // Call the async function immediately
-  }, [error, isFetching, user]);
-
-  const handleLoginSuccess = () => {
-    setLoginSuccess(true); // Set login success flag
-  };
   return (
     <div className=" flex">
       <div className=" absolute start-0 top-20 ">

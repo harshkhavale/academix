@@ -28,6 +28,7 @@ const createTeacher = async (req, res) => {
       experience,
       interests,
       socialLinks,
+      location,
     } = req.body;
 
     // Extract filenames from uploaded files
@@ -37,11 +38,11 @@ const createTeacher = async (req, res) => {
 
     const enrolled = []; // Assuming no enrolled users initially
 
-    // // Validate user ID
-    // const user = await User.findById({ _id: userId });
-    // if (!user) {
-    //   return res.status(404).json({ message: "User not found" });
-    // }
+    // Validate user ID
+    const user = await User.findById({ _id: userId });
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
 
     // Create new teacher instance
     const newTeacher = new Teacher({
@@ -56,6 +57,7 @@ const createTeacher = async (req, res) => {
       profilepicture: profilePicture,
       coverpicture: coverPicture,
       sociallinks: JSON.parse(socialLinks), // Parse socialLinks as JSON array
+      location,
     });
 
     // Save teacher to database
@@ -73,13 +75,15 @@ const createTeacher = async (req, res) => {
 // Retrieve all Teacher
 const getTeachers = async (req, res) => {
   try {
-    const Teacher = await Teacher.find();
-    res.status(200).json(Teacher);
+    const teachers = await Teacher.find();
+    res.status(200).json(teachers);
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    console.error("Error fetching teachers:", error);
+    res
+      .status(500)
+      .json({ message: "Error fetching teachers", error: error.message });
   }
 };
-
 // Retrieve a single teacher by ID
 const getTeacherById = async (req, res) => {
   try {
@@ -155,7 +159,18 @@ const enrollTeacher = async (teacherId, userIds) => {
     throw error; // Propagate the error to the caller
   }
 };
-
+const getTeacherByUserId = async (req, res) => {
+  try {
+    const teacher = await Teacher.findOne({ user_id: req.params.user_id });
+    if (teacher) {
+      res.json(teacher);
+    } else {
+      res.status(404).json({ message: "Teacher not found" });
+    }
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
 const getUsersTeacher = async (userId) => {
   try {
     if (!userId) {
@@ -170,6 +185,26 @@ const getUsersTeacher = async (userId) => {
   }
 };
 
+const updateTeacherClassrooms = async (req, res) => {
+  const { teacherId, classroomId } = req.body;
+  try {
+    const updatedTeacher = await Teacher.findOneAndUpdate(
+      { _id: teacherId },
+      { $addToSet: { classrooms: classroomId } }, // Push new classroom ID
+      { new: true } // Return the updated document
+    );
+
+    if (!updatedTeacher) {
+      throw new Error("Teacher not found");
+    }
+    res.json(updatedTeacher);
+    return updatedTeacher;
+  } catch (error) {
+    console.error("Error updating teacher classrooms:", error);
+    throw error; // Propagate the error to the caller
+  }
+};
+
 export {
   createTeacher,
   getTeachers,
@@ -178,5 +213,7 @@ export {
   deleteTeacherById,
   enrollTeacher,
   getUsersTeacher,
+  getTeacherByUserId,
+  updateTeacherClassrooms,
   upload,
 };

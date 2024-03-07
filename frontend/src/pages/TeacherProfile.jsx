@@ -6,15 +6,25 @@ import { coverimage } from "../assets";
 import { Instagram, LinkedIn } from "@mui/icons-material";
 import XIcon from "@mui/icons-material/X";
 import { toast } from "react-hot-toast";
+import { FiPlus } from "react-icons/fi";
+
 import AddTaskIcon from "@mui/icons-material/AddTask";
-const MentorProfile = () => {
+import { FiEdit } from "react-icons/fi";
+import { IoMdAdd } from "react-icons/io";
+import { MdMyLocation, MdOutlineFileUpload, MdVerified } from "react-icons/md";
+import { AiTwotoneExperiment } from "react-icons/ai";
+import { LiaUniversitySolid } from "react-icons/lia";
+import ClassroomCard from "../components/widgets/ClassroomCard";
+const TeacherProfile = () => {
   const { id } = useParams(); // Extracting id from URL params
-  const [mentor, setMentor] = useState([]);
+  const [teacher, setTeacher] = useState([]);
+  const [classrooms, setClassrooms] = useState([]);
+
   const user = useSelector((state) => state.user.user);
 
   const handleEnrollment = async () => {
-    const response = await publicRequest.post(`/mentors/${id}/enroll`, {
-      userIds: user.id,
+    const response = await publicRequest.post(`/teachers/${id}/enroll`, {
+      teacherIds: teacher.id,
     });
     console.log(response);
     if (response.status === 200) {
@@ -23,100 +33,159 @@ const MentorProfile = () => {
       toast.error(response.data.message);
     }
   };
+
   useEffect(() => {
-    const fetchMentors = async () => {
+    const fetchTeachers = async () => {
       try {
-        const response = await publicRequest.get(`/mentors/${id}`);
-        setMentor(response.data);
-        console.log("Mentors:", response.data); // Check subjects data
+        const response = await publicRequest.get(`/teachers/${id}`);
+        setTeacher(response.data);
+        console.log("Teachers:", response.data); // Check subjects data
       } catch (error) {
-        console.error("Error fetching subjects:", error);
+        console.error("Error fetching teachers:", error);
+      }
+    };
+    const fetchClassrooms = async () => {
+      try {
+        const response = await publicRequest.get(`classrooms/teacher/${id}`);
+        setClassrooms(response.data);
+        console.log("Classrooms:", response.data); // Check subjects data
+      } catch (error) {
+        console.error("Error fetching classrooms:", error);
       }
     };
 
-    fetchMentors();
-  }, [user.id]);
+    fetchClassrooms();
+    fetchTeachers();
+  }, [teacher.id]);
   return (
     <div className="profile relative h-full ">
       <img
-        src={`https://mentorius-server.onrender.com/assets/${mentor.coverpicture}`}
+        src={`http://localhost:5000/assets/${teacher.coverpicture}`}
         alt="banner"
         className="w-full h-[10rem] object-cover md:h-[20rem]"
       />
       <img
-        src={`https://mentorius-server.onrender.com/assets/${mentor.profilepicture}`}
+        src={`http://localhost:5000/assets/${teacher.profilepicture}`}
         alt="image"
-        className="w-40 md:w-80 absolute top-20 md:top-40 ms-[2rem] border-4 rounded-full h-40 md:h-80 object-cover"
+        className="w-40 md:w-80 absolute top-20 md:top-20 ms-[2rem] shadow-md h-40 md:h-80 object-cover bg-white"
       />
-      <div className=" absolute right-4 top-52 md:top-96 ">
-        <p className="font-bold text-5xl">12K</p>
-        <p className="text-xs w-min">mentorship provided</p>
-      </div>
-      <div className="info mt-20 md:mt-40 p-4 md:p-20">
-        <p className="font-bold text-2xl md:text-5xl">{mentor.name}</p>
-        <p>{mentor.enrolled}</p>
-        <p>Talks About</p>
-        <div className="keywords flex flex-wrap gap-4">
-          {mentor.keywords?.map((keyword, index) => (
-            <p className="font-bold" key={index}>
-              #{keyword}
-            </p>
-          ))}
-        </div>
-        <div>
-          <p>Description</p>
-          <p className=" font-semibold text-gray-500">{mentor.description}</p>
-          <p>
-            Lorem ipsum dolor sit amet consectetur adipisicing elit. Dolores
-            repellendus a omnis temporibus fugiat nam deleniti itaque culpa
-            ipsum molestiae.
-          </p>
-        </div>
-        <p>Education</p>
-        <div className="keywords flex flex-wrap gap-4">
-          {mentor.education?.map((degree, index) => (
-            <p
-              className="font-bold bg-primary rounded-3xl p-1 text-white"
-              key={index}
-            >
-              {degree}
-            </p>
-          ))}
-        </div>
-        <p>Hobbies</p>
-        <div className="interests flex flex-wrap gap-4">
-          {mentor.education?.map((degree, index) => (
-            <p
-              className="font-bold bg-primary rounded-3xl p-1 text-white"
-              key={index}
-            >
-              {degree}
-            </p>
-          ))}
-        </div>
-        <p>Social</p>
-        <div className="flex gap-4 justify-center bg-white rounded-3xl  shadow-xl p-2 items-center">
-          <div className="flex flex-col justify-center items-center">
-            <p>Linkedin</p>
-            <LinkedIn />
-          </div>
-          <div className="flex flex-col justify-center items-center">
-            <p>X/Tweeter</p>
-            <XIcon />
-          </div>
-          <div className="flex flex-col justify-center items-center">
-            <p>Instagram</p>
-            <Instagram />
-          </div>
-        </div>
 
-        <div className="flex justify-center my-8">
-          <div
-            onClick={handleEnrollment}
-            className="bg-primary cursor-pointer text-white gap-2 p-4 font-bold flex rounded-2xl shadow-2xl"
-          >
-            <AddTaskIcon />
-            <p>Enroll Mentor</p>
+      <div className="flex">
+        <div className=" w-9/12 m-4">
+          <div className="profile-display rounded-3xl ">
+            <div className="info grid grid-cols-2 gap-8 mt-28 pb-10 m-8 relative">
+              <div className="highlights col-span-1">
+                <div className="name flex items-center gap-2">
+                  <p className="font-bold text-5xl text-primary">
+                    {teacher.name}
+                  </p>
+                  <MdVerified />
+                  <p>{"(He/Him)"}</p>
+                </div>
+                <div className="bio">
+                  <div className="mb-4 flex items-center gap-2">
+                    {teacher.keywords?.map((keyword, index) => (
+                      <p
+                        className=" happy-font rounded-3xl p-1 font-bold "
+                        key={index}
+                      >
+                        #{keyword}
+                      </p>
+                    ))}
+                  </div>
+                </div>
+                <div className="location text-sm flex items-center gap-2">
+                  <MdMyLocation />
+                  <div className="location">
+                    <div className="mb-4">{teacher.location}</div>
+                  </div>
+                </div>
+                <div className="commuinity flex items-center gap-4">
+                  <div>
+                    <p className=" text-purple-400 font-bold text-5xl">78K</p>
+                    <p>lookouts</p>
+                  </div>
+                  <div className=" ">
+                    <button className="border-2 rounded-3xl p-1 border-primary text-primary happy-font flex items-center font-bold">
+                      <FiPlus /> lookout
+                    </button>
+                  </div>
+                </div>
+              </div>
+              <div className="experience col-span-1">
+                <div className="mb-4 bg-sky-100 p-2">
+                  <p className="p-2">About:</p>
+                  <p className=" happy-font font-bold">{teacher.description}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="social rounded-3xl border-2 border-black p-8 my-4 relative">
+            <p className=" font-bold text-2xl">Social Links & Interest's </p>
+            <div className="institute  items-center gap-2">
+              <div className="mb-4">
+                <label className="block my-4 mb-1">Social Links:</label>
+                <div className="mb-4 flex items-center gap-2">
+                  {teacher.sociallinks?.map((link, index) => (
+                    <p
+                      className=" happy-font rounded-3xl p-1 font-bold "
+                      key={link}
+                    >
+                      {link}
+                    </p>
+                  ))}
+                </div>
+              </div>
+              <div className="mb-4">
+                <label className="block mb-1">Interests:</label>
+                <div className="mb-4 flex items-center gap-2">
+                  {teacher.interests?.map((hobby, index) => (
+                    <p
+                      className=" happy-font rounded-3xl p-1 font-bold "
+                      key={hobby}
+                    >
+                      {hobby}
+                    </p>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+          <div className="flex flex-wrap h-min w-screen gap-4 p-2 md:w-[60vw]">
+            {classrooms.map((classroom, index) => (
+              <ClassroomCard key={index} classroom={classroom} />
+            ))}
+          </div>
+        </div>
+        <div className="w-3/12">
+          <div className="education rounded-3xl border-2 border-black p-8 my-4 relative">
+            <p className=" font-bold  my-4 text-2xl">Education & Experience </p>
+            <div div className="flex flex-col">
+              <div className="institute flex w-full items-center">
+                <div className="mb-4 w-11/12">
+                  <div className="flex items-center">
+                    <label className="block mb-1">Education:</label>
+                  </div>
+                  {teacher.education?.map((edu, index) => (
+                    <div className=" flex items-center gap-2">
+                      <LiaUniversitySolid className="h-8 w-8 bg-white p-1" />
+
+                      <p>{edu}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+              <div className="institute flex w-full items-center">
+                <div className="mb-4 w-11/12">
+                  <div className="flex items-center">
+                    <label className="block mb-1">Experience:</label>
+                  </div>{" "}
+                  <AiTwotoneExperiment className="h-8 w-8 bg-white p-1" />
+                  <p>{teacher.experience}</p>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -124,4 +193,4 @@ const MentorProfile = () => {
   );
 };
 
-export default MentorProfile;
+export default TeacherProfile;

@@ -47,8 +47,8 @@ const userSlice = createSlice({
     setTheme: (state) => {
       state.theme = state.theme === "LIGHT" ? "DARK" : "LIGHT";
     },
-    setUsertype: (state, action) => {
-      state.user.usertype = action.payload; // Update usertype of user
+    setUser: (state, action) => {
+      state.user = action.payload;
     },
   },
 });
@@ -63,6 +63,6 @@ export const {
   logout,
   initialState,
   setTheme,
-  setUsertype,
+  setUser,
 } = userSlice.actions;
 export default userSlice.reducer;

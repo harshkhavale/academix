@@ -16,7 +16,9 @@ import academix from "./academix.png";
 import books from "./books.png";
 import madem from "./madem.png";
 import teacherstanding from "./teacherstanding.png";
+import advertisement from "./advertisement.jpeg";
 export {
+  advertisement,
   teacherstanding,
   madem,
   books,

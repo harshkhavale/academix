@@ -13,38 +13,50 @@ import User from "./pages/User";
 import { useSelector } from "react-redux";
 import Auth from "./pages/Auth";
 // import MentorProfile from "./components/MentorProfile";
-import MentorProfile from "./pages/TeacherProfile";
 import Mentor from "./pages/Teacher";
 import TeacherForm from "./pages/TeacherForm";
+import Teacher from "./pages/Teacher";
+import TeacherProfile from "./pages/TeacherProfile";
+import ClassroomProfile from "./pages/ClassroomProfile";
 
 function App() {
   const user = useSelector((state) => state.user.user);
-
+  console.log("userrrr", user);
   return (
     <div className="App  overflow-x-hidden">
       <Toaster position="top-center" reverseOrder={false} />
       <Router>
         <Navbar />
         <Routes>
-          <Route path="/" element={user ? <User /> : <Main />} />
+          <Route path="/" element={<Main />} />
           <Route path="/*" element={<NotFound />} />
 
-          <Route
-            path="/userdashboard"
-            element={user ? <User /> : <Navigate to="/auth/login" />}
-          />
-          <Route
-            path="/teacherdashboard"
-            element={user ? <Mentor /> : <Navigate to="/auth/login" />}
-          />
-          <Route path="/auth/:parameter" element={<Auth />} />
-          <Route path="/teacher/:id" element={<MentorProfile />} />
-          <Route path="/teacherform" element={<TeacherForm />} />
+          {user && (
+            <Route
+              path="/userdashboard"
+              element={
+                !user.isTeacher ? <User /> : <Navigate to="/auth/login" />
+              }
+            />
+          )}
 
-          {/* <Route
-            path="/payment"
-            element={user ? <Payment /> : <Navigate to="/auth/login" />}
-          /> */}
+          {user && (
+            <Route
+              path="/teacherdashboard"
+              element={
+                user.isTeacher ? <Teacher /> : <Navigate to="/auth/login" />
+              }
+            />
+          )}
+          <Route
+            path="/auth/:parameter"
+            element={user ? user.isTeacher ? <Teacher /> : <User /> : <Auth />}
+          />
+
+          <Route path="/teachers/:id" element={<TeacherProfile />} />
+          <Route path="/classrooms/:id" element={<ClassroomProfile />} />
+
+          <Route path="/teacherform" element={<TeacherForm />} />
         </Routes>
       </Router>
     </div>

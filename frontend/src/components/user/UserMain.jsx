@@ -7,7 +7,7 @@ import BarChart from "../widgets/BarChart";
 import PolarAreaChart from "../widgets/PolarAreaChart";
 import { attendance, score } from "../../constants/student";
 import { books, madem, teacherbanner, userbanner } from "../../assets";
-import SubjectCard from "../widgets/SubjectCard";
+import SubjectCard from "../widgets/ClassroomCard";
 
 const UserMain = () => {
   const [subjects, setSubjects] = useState([]);

@@ -8,6 +8,7 @@ import JoinClassrooms from "./modals/JoinClassrooms";
 import { useSelector } from "react-redux";
 import { CiSearch } from "react-icons/ci";
 import { FiPlus } from "react-icons/fi";
+import CreateClassroom from "./modals/CreateClassroom";
 
 const Navbar = () => {
   const [showModal, setShowModal] = useState(false);
@@ -16,8 +17,8 @@ const Navbar = () => {
 
   return (
     <div className="navbar text-sm md:text-base w-full p-2 flex justify-between  items-center">
-      {user && user.usertype == "MENTOR" && showModal && (
-        <CreateSubject onClose={() => setShowModal(false)} />
+      {user && user.isTeacher && showModal && (
+        <CreateClassroom onClose={() => setShowModal(false)} />
       )}
       <div className="navbar text-sm md:text-base p-2 flex justify-between w-full overflow-x-hidden items-center">
         {showModal && <JoinClassrooms onClose={() => setShowModal(false)} />}
@@ -68,7 +69,7 @@ const Navbar = () => {
             </svg>
           </div>
 
-          {user && user.usertype == "MENTOR" && isNonMobileScreen && (
+          {user && user.isTeacher && isNonMobileScreen && (
             <button
               onClick={() => setShowModal(true)}
               className="ml-auto bg-primary text-white shadow-lg p-2 flex  items-center gap-1 rounded-3xl happy-font font-bold"
@@ -77,7 +78,7 @@ const Navbar = () => {
             </button>
           )}
 
-          {user && user.usertype != "MENTOR" && isNonMobileScreen && (
+          {user && !user.isTeacher && isNonMobileScreen && (
             <Link to={"/teacherform"}>
               <button className="ml-auto bg-primary text-white shadow-lg p-2 flex  items-center gap-1 rounded-3xl happy-font font-bold">
                 <FiPlus />

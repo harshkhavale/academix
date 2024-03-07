@@ -5,6 +5,7 @@ import cors from "cors";
 import authRouter from "./routes/Auth.js";
 import classroomRouter from "./routes/Classroom.js";
 import teacherRouter from "./routes/Teacher.js";
+import userRouter from "./routes/User.js";
 import bodyParser from "body-parser";
 
 import multer from "multer";
@@ -54,6 +55,7 @@ app.get("/test", (req, res) => {
 app.use("/api/auth", authRouter);
 app.use("/api/classrooms", classroomRouter);
 app.use("/api/teachers", teacherRouter);
+app.use("/api/users", userRouter);
 
 // Global error handler middleware
 app.use((err, req, res, next) => {

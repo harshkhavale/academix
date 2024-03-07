@@ -8,65 +8,23 @@ import { IconButton } from "@mui/material"; // Importing Material-UI IconButton
 import { toast } from "react-hot-toast";
 import { MdOutlineFileUpload } from "react-icons/md";
 import Compressor from "compressorjs";
-const CreateClassroom = ({ onClose }) => {
-  const [subjectName, setSubjectName] = useState("");
+const CreateResource = ({ onClose }) => {
+  const [name, setName] = useState("");
+  const [type, setType] = useState("");
+
   const [description, setDescription] = useState("");
+  const [file, setFile] = useState(null);
+
   const user = useSelector((state) => state.user.user);
-  const [thumbnail, setThumbnail] = useState(null);
-  const [previewThumbnail, setPreviewThumbnail] = useState();
-  const [thumbnailFileName, setThumbnailFileName] = useState("");
-  const generateLink = () => {
-    const uniqueId = uuidv4();
-    return `https://example.com/classroom/${uniqueId}`;
-  };
-  const compressImage = (file) => {
-    return new Promise((resolve, reject) => {
-      new Compressor(file, {
-        quality: 0.8,
-        maxWidth: 800,
-        maxHeight: 800,
-        success(result) {
-          resolve(URL.createObjectURL(result));
-        },
-        error(error) {
-          reject(error);
-        },
-      });
-    });
-  };
-  const handleThumbnailFileChange = (event) => {
-    const file = event.target.files?.[0]; // Add null check
-    setThumbnail(file);
-    if (file) {
-      setThumbnailFileName(file.name);
-      compressImage(file)
-        .then((compressedImage) => {
-          // Change the type to string or ArrayBuffer, as CompressorJS may return ArrayBuffer
-          setPreviewThumbnail(compressedImage);
-        })
-        .catch((error) => {
-          console.error("Error compressing cover image:", error);
-        });
-    } else {
-      setThumbnailFileName("cover-picture");
-    }
-  };
-  const handleCreateSubject = async () => {
-    // Function to handle file input change
 
-    const link = generateLink();
-
+  const handleCreateResource = async () => {
     try {
-      // Make an API call to the backend to create a new subject
-
       const formData = new FormData();
-      formData.append("name", subjectName);
-      formData.append("description", description);
-      formData.append("thumbnail", thumbnail);
-      formData.append("uuid", link);
-      formData.append("teacher_id", user._id);
+      formData.append("name", name);
+      formData.append("type", type);
+      formData.append("file", file);
 
-      const response = await publicRequest.post("/classrooms", formData);
+      const response = await publicRequest.post("/resource", formData);
 
       console.log("Subject created:", response.data);
       console.log("Response:", response);
@@ -108,9 +66,9 @@ const CreateClassroom = ({ onClose }) => {
             <form className="flex-1 mt-10">
               <input
                 type="text"
-                placeholder="Subject Name"
-                value={subjectName}
-                onChange={(e) => setSubjectName(e.target.value)}
+                placeholder="Resource Name"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
                 className="block w-full border-2 border-gray-400 hover:border-black rounded-3xl p-4 text-sm"
               />
               <textarea
@@ -123,15 +81,6 @@ const CreateClassroom = ({ onClose }) => {
               />
               <p className="font-bold">thumbnail</p>
               <div className="profileimage relative rounded-3xl flex items-center justify-center  h-[25vh] w-full overflow-hidden    border-2 border-gray-400 border-dashed ">
-                {previewThumbnail && (
-                  <div className=" h-[25vh] w-[25vh]">
-                    <img
-                      src={previewThumbnail}
-                      alt="Profile Preview"
-                      className="w-full h-full overflow-hidden object-cover"
-                    />
-                  </div>
-                )}
                 <div className="flex justify-center">
                   <label
                     htmlFor="thumbnail-upload"
@@ -139,18 +88,12 @@ const CreateClassroom = ({ onClose }) => {
                   >
                     <MdOutlineFileUpload className="text-3xl absolute flex justify-center items-center  top-16 left-40 z-50 bg-white rounded-full p-1" />
                   </label>
-                  <input
-                    id="thumbnail-upload"
-                    type="file"
-                    className="hidden"
-                    onChange={handleThumbnailFileChange}
-                  />
                 </div>
               </div>
             </form>
             <div className="flex justify-center">
               <button
-                onClick={handleCreateSubject}
+                onClick={handleCreateResource}
                 className="bg-primary text-white shadow-lg p-3 m-4 flex items-center gap-2 rounded-2xl hover:bg-primary/80"
               >
                 Create Classroom
@@ -163,4 +106,4 @@ const CreateClassroom = ({ onClose }) => {
   );
 };
 
-export default CreateClassroom;
+export default CreateResource;

@@ -8,6 +8,8 @@ import {
   enrollTeacher,
   getUsersTeacher,
   upload,
+  getTeacherByUserId,
+  updateTeacherClassrooms,
 } from "../controllers/Teacher.js";
 
 const router = express.Router();
@@ -25,10 +27,12 @@ router.post(
 router.get("/", getTeachers);
 
 router.get("/:id", getTeacherById);
+router.get("/find-user/:user_id", getTeacherByUserId);
 
 router.put("/:id", upload.single("profilePicture"), updateTeacherById);
 
 router.delete("/:id", deleteTeacherById);
+router.post("/update-classrooms", updateTeacherClassrooms);
 
 router.post("/:teacherId/enroll", async (req, res) => {
   const { teacherId } = req.params;
