@@ -6,6 +6,7 @@ import authRouter from "./routes/Auth.js";
 import classroomRouter from "./routes/Classroom.js";
 import teacherRouter from "./routes/Teacher.js";
 import userRouter from "./routes/User.js";
+import resourceRouter from "./routes/Resource.js";
 import bodyParser from "body-parser";
 
 import multer from "multer";
@@ -17,6 +18,20 @@ import { fileURLToPath } from "url";
 dotenv.config();
 
 const app = express();
+app.use(
+  cors({
+    origin: "http://localhost:3000", // Allow requests from this origin
+    methods: ["GET", "POST"], // Allow these HTTP methods
+    credentials: true, // Allow cookies to be sent with the request
+  })
+);
+var allowCrossDomain = function (req, res, next) {
+  res.header("Access-Control-Allow-Origin", "*");
+  res.header("Access-Control-Allow-Methods", "GET,PUT,POST,DELETE");
+  res.header("Access-Control-Allow-Headers", "Content-Type");
+  next();
+};
+app.use(allowCrossDomain);
 const port = process.env.PORT || 5001;
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -31,13 +46,9 @@ app.use(
 );
 app.use("/assets", express.static(path.join(__dirname, "public/assets")));
 app.use("/database", express.static(path.join(__dirname, "public/database")));
+app.use("/resources", express.static(path.join(__dirname, "public/resources")));
 
-const corsOptions = {
-  origin: "http://localhost:3000",
-  credentials: true,
-  optionSuccessStatus: 200,
-};
-app.use(cors(corsOptions));
+//some other code
 app.use(express.json());
 
 mongoose
@@ -56,6 +67,8 @@ app.use("/api/auth", authRouter);
 app.use("/api/classrooms", classroomRouter);
 app.use("/api/teachers", teacherRouter);
 app.use("/api/users", userRouter);
+
+app.use("/api/resources", resourceRouter);
 
 // Global error handler middleware
 app.use((err, req, res, next) => {

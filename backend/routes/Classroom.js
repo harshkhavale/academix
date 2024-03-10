@@ -7,12 +7,16 @@ import {
   updateClassroom,
   deleteClassroom,
   getClassroomsByTeacherId,
+  updateEnrolledUsers,
+  updateResources,
 } from "../controllers/Classroom.js";
 
 const router = express.Router();
 
 // Create a new classroom
 router.post("/", createClassroom);
+router.post("/enroll", updateEnrolledUsers);
+router.post("/resource", updateResources);
 
 // Get all classrooms
 router.get("/", getAllClassrooms);

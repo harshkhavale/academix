@@ -126,3 +126,43 @@ export const getClassroomsByUserId = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+
+// Update resources in the classroom
+export const updateResources = async (req, res) => {
+  const { classroom_id, resource_id } = req.body;
+
+  try {
+    // Find the classroom by ID
+    const classroom = await Classroom.findById(classroom_id);
+
+    // Add the resourceId to the resources array
+    classroom.resources.push(resource_id);
+
+    // Save the updated classroom
+    await classroom.save();
+
+    res.json(classroom).status(200); // Return the updated classroom
+  } catch (error) {
+    throw new Error("Error updating resources in the classroom");
+  }
+};
+
+// Update enrolled users in the classroom
+export const updateEnrolledUsers = async (req, res) => {
+  const { classroom_id, user_id } = req.body;
+
+  try {
+    // Find the classroom by ID
+    const classroom = await Classroom.findById(classroom_id);
+
+    // Add the userId to the enrolled array
+    classroom.enrolled.push(user_id);
+
+    // Save the updated classroom
+    await classroom.save();
+
+    res.json(classroom).status(200); // Return the updated classroom
+  } catch (error) {
+    throw new Error("Error updating enrolled users in the classroom");
+  }
+};

@@ -16,18 +16,11 @@ const Resource = mongoose.Schema(
       required: true,
     },
 
-    files: [
-      {
-        filename: {
-          type: String,
-          required: true,
-        },
-        path: {
-          type: String,
-          required: true,
-        },
-      },
-    ],
+    file: {
+      type: String,
+      required: true,
+    },
+
     description: {
       type: String,
       required: true,

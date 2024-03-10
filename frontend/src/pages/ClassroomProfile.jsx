@@ -6,13 +6,17 @@ import ResourceCard from "../components/widgets/ResourceCard";
 import { FiPlus } from "react-icons/fi";
 import { useSelector } from "react-redux";
 import CreateResource from "../components/modals/CreateResource";
+import { toast } from "react-hot-toast";
 const ClassroomProfile = () => {
   const [showModal, setShowModal] = useState(false);
 
   const { id } = useParams(); // Extracting id from URL params
   const [classroom, setClassroom] = useState();
   const [teacher, setTeacher] = useState();
+  const [resources, setResources] = useState();
+
   const user = useSelector((state) => state.user.user);
+
   useEffect(() => {
     const fetchClassroom = async () => {
       try {
@@ -28,6 +32,16 @@ const ClassroomProfile = () => {
         } catch (error) {
           console.error("Error fetching Teacher:", error);
         }
+        try {
+          const response = await publicRequest.get(
+            `/resources/classroom/${id}`
+          );
+
+          setResources(response.data);
+          console.log("Resources:", response.data);
+        } catch (error) {
+          console.error("Error fetching Classroom:", error);
+        }
       } catch (error) {
         console.error("Error fetching Classroom:", error);
       }
@@ -36,10 +50,22 @@ const ClassroomProfile = () => {
     fetchClassroom();
   }, [id]);
 
+  const enrollClassroom = async () => {
+    try {
+      const response = await publicRequest.post(`/classrooms/enroll`, {
+        classroom_id: id,
+        user_id: user.id,
+      });
+      toast.success("Enrolled Successfull!");
+      console.log("Enroll:", response.data);
+    } catch (error) {
+      console.error("Error Enrolling Classroom:", error);
+    }
+  };
   return (
     <div className="grid grid-cols-10 w-screen h-screen">
       {user && user.isTeacher && showModal && (
-        <CreateResource onClose={() => setShowModal(false)} />
+        <CreateResource onClose={() => setShowModal(false)} classID={id} />
       )}
       <div className="col-span-2">
         <img
@@ -58,9 +84,12 @@ const ClassroomProfile = () => {
             <p className="">upload resources</p>
           </button>
         ) : (
-          <button className=" flex items-center gap-1 font-bold happy-font text-primary border-2 border-primary rounded-3xl p-1">
+          <button
+            onClick={enrollClassroom}
+            className=" flex items-center gap-1 font-bold happy-font text-primary border-2 border-primary rounded-3xl p-1"
+          >
             <FiPlus />
-            <p className="">Enroll</p>
+            Enroll
           </button>
         )}
 
@@ -134,8 +163,12 @@ const ClassroomProfile = () => {
             </Link>
           )}
         </div>
-        <div className="resources p-8">
-          <ResourceCard />
+
+        <div className="resources flex flex-wrap gap-2 p-8">
+          {resources?.map((resource, index) => (
+            // <PdfPreview key={index} src={resource} />
+            <ResourceCard src={resource} />
+          ))}
         </div>
       </div>
     </div>

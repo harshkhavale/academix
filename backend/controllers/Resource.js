@@ -1,51 +1,73 @@
+import Resource from "../models/Resource.js";
 import multer from "multer";
 import path from "path";
-import fs from "fs";
-import Resource from "./models/Resource";
 
-// Multer setup to save files to the 'resources' folder
+// Multer setup to save files
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    cb(null, "resources/");
+    cb(null, "public/resources/");
   },
   filename: function (req, file, cb) {
-    cb(null, Date.now() + path.extname(file.originalname));
+    // Generating a unique filename based on current time and original extension
+    const uniqueFilename = Date.now() + path.extname(file.originalname);
+    // Storing the filename in the request object for later access
+    req.generatedFilename = uniqueFilename;
+    cb(null, uniqueFilename);
   },
 });
-const upload = multer({ storage: storage });
+
+const upload = multer({ storage: storage }).single("file");
 
 // Create a new resource
-export const createResource = async (req, res, next) => {
+export const createResource = async (req, res) => {
   try {
-    const { name, type, description } = req.body;
-    const { filename, path: filePath } = req.file;
+    upload(req, res, async (err) => {
+      if (err instanceof multer.MulterError) {
+        console.log("multer error: " + err.message);
+        return res.status(500).json({ message: err.message });
+      } else if (err) {
+        console.log("multer error: " + err.message);
+        return res.status(500).json({ message: err.message });
+      }
 
-    // Save resource details to database
-    const newResource = await Resource.create({
-      name,
-      type,
-      files: [{ filename, path: filePath }],
-      description,
+      const { name, type, classroom, description } = req.body;
+      const file = req.generatedFilename; // Using the generated filename
+      const newResource = new Resource({
+        name,
+        type,
+        classroom,
+        file,
+        description,
+      });
+
+      const savedResource = await newResource.save();
+      res.status(201).json(savedResource);
     });
-
-    res.status(201).json(newResource);
   } catch (error) {
-    next(error);
+    res.status(500).json({ message: error.message });
   }
 };
-
-// Read all resources
-export const getAllResources = async (req, res, next) => {
+export const getResourcesByClassroomId = async (req, res) => {
+  try {
+    const { classroom_id } = req.params;
+    const classrooms = await Resource.find({ classroom: classroom_id });
+    res.json(classrooms);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+// Get all resources
+export const getAllResources = async (req, res) => {
   try {
     const resources = await Resource.find();
     res.json(resources);
   } catch (error) {
-    next(error);
+    res.status(500).json({ message: error.message });
   }
 };
 
-// Read a specific resource by ID
-export const getResourceById = async (req, res, next) => {
+// Get a specific resource by ID
+export const getResourceById = async (req, res) => {
   try {
     const resource = await Resource.findById(req.params.id);
     if (!resource) {
@@ -53,12 +75,12 @@ export const getResourceById = async (req, res, next) => {
     }
     res.json(resource);
   } catch (error) {
-    next(error);
+    res.status(500).json({ message: error.message });
   }
 };
 
 // Update a resource by ID
-export const updateResource = async (req, res, next) => {
+export const updateResource = async (req, res) => {
   try {
     const updatedResource = await Resource.findByIdAndUpdate(
       req.params.id,
@@ -70,21 +92,19 @@ export const updateResource = async (req, res, next) => {
     }
     res.json(updatedResource);
   } catch (error) {
-    next(error);
+    res.status(500).json({ message: error.message });
   }
 };
 
 // Delete a resource by ID
-export const deleteResource = async (req, res, next) => {
+export const deleteResource = async (req, res) => {
   try {
     const resource = await Resource.findByIdAndDelete(req.params.id);
     if (!resource) {
       return res.status(404).json({ message: "Resource not found" });
     }
-    // Remove the associated file from the server
-    fs.unlinkSync(resource.files[0].path);
     res.json({ message: "Resource deleted successfully" });
   } catch (error) {
-    next(error);
+    res.status(500).json({ message: error.message });
   }
 };
